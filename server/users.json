@@ -1,0 +1,18 @@
+[
+  {
+    "username": "admin",
+    "passwordHash": "$2b$12$yjprpuoooTe3s1R8qx3WWeZn01.qEisR.PpZlxX..Ftl3wkVYEIAO"
+  },
+  {
+    "username": "lord",
+    "passwordHash": "$2b$12$wkVTzQW85JzpnOo0mB42n.YKAIY5.MgtNy.bvR.8p1zmQ5TxyE.sK"
+  },
+  {
+    "username": "great",
+    "passwordHash": "$2b$12$m04jz4vUSnkIl2DTkkA8XuapsJdOM4X5Y0pnMxKePvOzSX4UqUxea"
+  },
+  {
+    "username": "admin1",
+    "passwordHash": "$2b$12$hHOHbU90Y/0YlSlcjBgtIeo9qkGfvcch0WU4ItHkHAqi9tUTy.1ie"
+  }
+]

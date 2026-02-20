@@ -1,0 +1,449 @@
+@if (!auth.isLoggedIn()) {
+  <app-login />
+} @else {
+
+<div class="app">
+
+  <header class="header">
+    <h1 class="header-title">My Todos</h1>
+
+    <div class="header-actions">
+      <span class="header-username">{{ auth.username() }}</span>
+      <button
+        class="logout-btn"
+        (click)="logout()"
+        title="Sign out"
+        aria-label="Sign out"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+      <button
+        class="theme-btn"
+        (click)="toggleTheme()"
+        [title]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        aria-label="Toggle theme"
+      >
+      @if (theme() === 'dark') {
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      }
+      </button>
+    </div>
+  </header>
+
+  <!-- ── New Task toggle ──────────────────────────────────────────────────────── -->
+  <button class="filters-toggle" (click)="toggleNewTodo()" [class.open]="newTodoOpen()">
+    <span class="filters-toggle-label">New Task</span>
+    <svg
+      class="filters-arrow"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+
+  <div class="new-todo-body" [class.open]="newTodoOpen()">
+    <div class="input-row">
+      <input
+        class="todo-input"
+        type="text"
+        placeholder="What needs to be done?"
+        [value]="newTodoText()"
+        (input)="onNewTodoTextInput($event)"
+        (keydown.enter)="addTodo()"
+        autocomplete="off"
+      />
+      <button class="add-btn" (click)="addTodo()">Add</button>
+    </div>
+
+    <div class="option-toggles">
+      <button
+        class="option-toggle-btn"
+        [class.active]="showPriority()"
+        (click)="toggleShowPriority()"
+        title="Toggle priority selector"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+        </svg>
+        Priority
+      </button>
+      <button
+        class="option-toggle-btn"
+        [class.active]="showDueDate()"
+        (click)="toggleShowDueDate()"
+        title="Toggle due date"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Due date
+      </button>
+    </div>
+
+    <div class="option-body" [class.open]="showPriority()">
+      <div class="priority-selector">
+        <span class="selector-label">Priority:</span>
+        <button
+          class="priority-btn low"
+          [class.selected]="newTodoPriority() === 'low'"
+          (click)="newTodoPriority.set('low')"
+        >
+          <span class="priority-dot"></span> Low
+        </button>
+        <button
+          class="priority-btn medium"
+          [class.selected]="newTodoPriority() === 'medium'"
+          (click)="newTodoPriority.set('medium')"
+        >
+          <span class="priority-dot"></span> Medium
+        </button>
+        <button
+          class="priority-btn high"
+          [class.selected]="newTodoPriority() === 'high'"
+          (click)="newTodoPriority.set('high')"
+        >
+          <span class="priority-dot"></span> High
+        </button>
+      </div>
+    </div>
+
+    <div class="option-body" [class.open]="showDueDate()">
+      <div class="due-date-row">
+        <span class="selector-label">Due date:</span>
+        <input
+          class="due-date-input"
+          type="date"
+          [value]="newTodoDueDate()"
+          (input)="onNewTodoDueDateInput($event)"
+        />
+        @if (newTodoDueDate()) {
+          <button class="clear-date-btn" (click)="newTodoDueDate.set('')" title="Clear date" aria-label="Clear date">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Filters toggle ─────────────────────────────────────────────────────── -->
+  <button class="filters-toggle" (click)="toggleFilters()" [class.open]="filtersOpen()">
+    <span class="filters-toggle-label">Filters</span>
+    <svg
+      class="filters-arrow"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+
+  <div class="filters-body" [class.open]="filtersOpen()">
+    <div class="filters">
+      <button
+        class="filter-btn"
+        [class.active]="filter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        All
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="filter() === 'active'"
+        (click)="setFilter('active')"
+      >
+        Active
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="filter() === 'completed'"
+        (click)="setFilter('completed')"
+      >
+        Completed
+      </button>
+    </div>
+
+    <div class="priority-filters">
+      <span class="selector-label">Priority:</span>
+      <button
+        class="priority-filter-btn"
+        [class.active]="priorityFilter() === 'all'"
+        (click)="setPriorityFilter('all')"
+      >All</button>
+      <button
+        class="priority-filter-btn low"
+        [class.active]="priorityFilter() === 'low'"
+        (click)="setPriorityFilter('low')"
+      ><span class="priority-dot"></span> Low</button>
+      <button
+        class="priority-filter-btn medium"
+        [class.active]="priorityFilter() === 'medium'"
+        (click)="setPriorityFilter('medium')"
+      ><span class="priority-dot"></span> Medium</button>
+      <button
+        class="priority-filter-btn high"
+        [class.active]="priorityFilter() === 'high'"
+        (click)="setPriorityFilter('high')"
+      ><span class="priority-dot"></span> High</button>
+    </div>
+  </div>
+
+  <!-- ── Show completed toggle ──────────────────────────────────────────────── -->
+  @if (completedCount() > 0) {
+    <div class="completed-toggle-bar">
+      <button
+        class="option-toggle-btn"
+        [class.active]="showCompleted()"
+        (click)="toggleShowCompleted()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        @if (showCompleted()) { Hide completed } @else { Show completed ({{ completedCount() }}) }
+      </button>
+    </div>
+  }
+
+  <!-- ── Todo list ───────────────────────────────────────────────────────────── -->
+  <ul class="todo-list">
+
+    @if (loading()) {
+      <li class="loading-state" aria-label="Loading todos">
+        <span class="loading-dots">
+          <span></span><span></span><span></span>
+        </span>
+      </li>
+    } @else {
+
+      @for (todo of filteredTodos(); track todo.id) {
+
+        <li
+          class="todo-item"
+          [class.completed]="todo.completed"
+          [class.overdue]="isOverdue(todo)"
+          [class.editing]="editingId() === todo.id"
+          [class.dragging]="draggedId() === todo.id"
+          [class.drag-over]="dragOverId() === todo.id && draggedId() !== todo.id"
+          [attr.draggable]="editingId() === todo.id ? null : true"
+          (dragstart)="onDragStart(todo.id, $event)"
+          (dragover)="onDragOver(todo.id, $event)"
+          (drop)="onDrop(todo.id, $event)"
+          (dragend)="onDragEnd()"
+        >
+
+          @if (editingId() !== todo.id) {
+
+            <span class="drag-handle" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="9"  cy="5"  r="1.5"/><circle cx="15" cy="5"  r="1.5"/>
+                <circle cx="9"  cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+                <circle cx="9"  cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/>
+              </svg>
+            </span>
+
+            <label
+              class="checkbox-label"
+              [attr.aria-label]="'Mark ' + todo.text + ' as ' + (todo.completed ? 'incomplete' : 'complete')"
+            >
+              <input
+                type="checkbox"
+                [checked]="todo.completed"
+                (change)="toggleTodo(todo.id)"
+              />
+              <span class="checkmark"></span>
+            </label>
+
+            <span
+              class="priority-badge"
+              [class.low]="todo.priority === 'low'"
+              [class.medium]="todo.priority === 'medium'"
+              [class.high]="todo.priority === 'high'"
+              (click)="cyclePriority(todo.id)"
+              (keydown.enter)="cyclePriority(todo.id)"
+              (keydown.space)="cyclePriority(todo.id)"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="'Priority: ' + todo.priority + '. Click to change.'"
+              title="Click to change priority"
+            >{{ todo.priority }}</span>
+
+            <span
+              class="todo-text"
+              (dblclick)="startEdit(todo.id, todo.text)"
+              (keydown.enter)="startEdit(todo.id, todo.text)"
+              tabindex="0"
+              title="Double-click or Enter to edit"
+            >{{ todo.text }}</span>
+
+            @if (todo.dueDate) {
+              <span class="due-chip" [class.overdue]="isOverdue(todo)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {{ formatDueDate(todo.dueDate) }}
+              </span>
+            }
+
+            <button
+              class="delete-btn"
+              (click)="deleteTodo(todo.id)"
+              aria-label="Delete todo"
+              title="Delete"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+          } @else {
+            <input
+              #editInput
+              class="edit-input"
+              type="text"
+              [value]="editingText()"
+              (input)="onEditingTextInput($event)"
+              (keydown.enter)="commitEdit()"
+              (keydown.escape)="cancelEdit()"
+              (blur)="commitEdit()"
+              autocomplete="off"
+            />
+          }
+        </li>
+
+      } @empty {
+        <li class="empty-state">
+          @if (filter() === 'completed') {
+            <span>No completed todos yet</span>
+          } @else if (filter() === 'active') {
+            <span>All caught up!</span>
+          } @else {
+            <span>Add your first todo above!</span>
+          }
+        </li>
+      }
+
+    }
+  </ul>
+
+  <!-- ── Archive ─────────────────────────────────────────────────────────────── -->
+  @if (archivedTodos().length > 0) {
+    <button class="filters-toggle archive-toggle" (click)="toggleArchive()" [class.open]="archiveOpen()">
+      <span class="filters-toggle-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-2px">
+          <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+        </svg>
+        Archive ({{ archivedTodos().length }})
+      </span>
+      <svg
+        class="filters-arrow"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+
+    <div class="archive-body" [class.open]="archiveOpen()">
+      <ul class="archive-list">
+        @for (todo of archivedTodos(); track todo.id) {
+          <li class="archive-item">
+
+            <span class="archive-check" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </span>
+
+            <span
+              class="priority-badge"
+              [class.low]="todo.priority === 'low'"
+              [class.medium]="todo.priority === 'medium'"
+              [class.high]="todo.priority === 'high'"
+            >{{ todo.priority }}</span>
+
+            <span class="archive-text">{{ todo.text }}</span>
+
+            @if (todo.dueDate) {
+              <span class="due-chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {{ formatDueDate(todo.dueDate) }}
+              </span>
+            }
+
+            <span class="archive-date">done {{ formatCompletedDate(todo.completedAt!) }}</span>
+
+            <button
+              class="delete-btn"
+              (click)="deleteTodo(todo.id)"
+              aria-label="Delete from archive"
+              title="Delete"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  <footer class="footer">
+    <span class="count">
+      {{ activeCount() }} {{ activeCount() === 1 ? 'item' : 'items' }} left
+    </span>
+  </footer>
+
+  @if (toast()) {
+    <div class="toast" role="alert" aria-live="assertive">{{ toast() }}</div>
+  }
+
+</div>
+
+} <!-- @else isLoggedIn -->

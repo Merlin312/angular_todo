@@ -1,0 +1,138 @@
+<div class="login-wrap">
+  <div class="login-card">
+
+    <div class="login-header">
+      <h1 class="login-title">My Todos</h1>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs">
+      <button
+        class="mode-tab"
+        [class.active]="mode() === 'login'"
+        type="button"
+        (click)="switchMode('login')"
+      >Sign In</button>
+      <button
+        class="mode-tab"
+        [class.active]="mode() === 'register'"
+        type="button"
+        (click)="switchMode('register')"
+      >Register</button>
+    </div>
+
+    @if (sessionExpired()) {
+      <p class="login-session-expired" role="status">
+        Your session has expired. Please sign in again.
+      </p>
+    }
+
+    <form class="login-form" (submit)="$event.preventDefault(); submit()">
+
+      <div class="field">
+        <label class="field-label" for="login-username">Username</label>
+        <input
+          id="login-username"
+          class="field-input"
+          type="text"
+          [placeholder]="mode() === 'register' ? 'Choose a username' : 'Enter username'"
+          [value]="username()"
+          (input)="onUsernameInput($event)"
+          autocomplete="username"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
+        />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="login-password">Password</label>
+        <div class="password-wrap">
+          <input
+            id="login-password"
+            class="field-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            [placeholder]="mode() === 'register' ? 'Min. 6 characters' : 'Enter password'"
+            [value]="password()"
+            (input)="onPasswordInput($event)"
+            [autocomplete]="mode() === 'register' ? 'new-password' : 'current-password'"
+          />
+          <button
+            type="button"
+            class="eye-btn"
+            (click)="toggleShowPassword()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          >
+            @if (showPassword()) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (mode() === 'register') {
+        <div class="field">
+          <label class="field-label" for="login-confirm">Confirm Password</label>
+          <div class="password-wrap">
+            <input
+              id="login-confirm"
+              class="field-input"
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              placeholder="Repeat password"
+              [value]="confirmPassword()"
+              (input)="onConfirmInput($event)"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="eye-btn"
+              (click)="toggleShowConfirmPassword()"
+              [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+            >
+              @if (showConfirmPassword()) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (error()) {
+        <p class="login-error" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ error() }}
+        </p>
+      }
+
+      <button class="login-btn" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <span class="login-spinner"></span>
+        } @else if (mode() === 'login') {
+          Sign In
+        } @else {
+          Create Account
+        }
+      </button>
+
+    </form>
+
+  </div>
+</div>

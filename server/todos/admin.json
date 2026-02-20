@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1771570067710,
+    "text": "прочитати книгу",
+    "completed": false,
+    "priority": "high",
+    "dueDate": null,
+    "completedAt": null
+  },
+  {
+    "id": 1771570047822,
+    "text": "поснідати s",
+    "completed": false,
+    "priority": "medium",
+    "dueDate": null,
+    "completedAt": null
+  },
+  {
+    "id": 1771531275236,
+    "text": "first task",
+    "completed": true,
+    "priority": "high",
+    "dueDate": null,
+    "completedAt": null
+  },
+  {
+    "id": 1771531300991,
+    "text": "like this world",
+    "completed": true,
+    "priority": "high",
+    "dueDate": null,
+    "completedAt": 1771594637311
+  },
+  {
+    "id": 1771531327834,
+    "text": "go to forest",
+    "completed": true,
+    "priority": "low",
+    "dueDate": null,
+    "completedAt": 1771572493079
+  },
+  {
+    "id": 1771531350014,
+    "text": "and",
+    "completed": true,
+    "priority": "medium",
+    "dueDate": null,
+    "completedAt": 1771573234546
+  },
+  {
+    "id": 1771569362999,
+    "text": "попилисосити в кімнаті",
+    "completed": false,
+    "priority": "medium",
+    "dueDate": null,
+    "completedAt": null
+  },
+  {
+    "id": 1771573576168,
+    "text": "завтра зроби",
+    "completed": false,
+    "priority": "high",
+    "dueDate": "2026-02-21",
+    "completedAt": null
+  },
+  {
+    "id": 1771574530676,
+    "text": "ok",
+    "completed": false,
+    "priority": "medium",
+    "dueDate": "2026-02-23",
+    "completedAt": null
+  },
+  {
+    "id": 1771575349136,
+    "text": "щось",
+    "completed": false,
+    "priority": "low",
+    "dueDate": "2026-11-26",
+    "completedAt": null
+  },
+  {
+    "id": 1771594623132,
+    "text": "add",
+    "completed": false,
+    "priority": "medium",
+    "dueDate": null,
+    "completedAt": null
+  }
+]

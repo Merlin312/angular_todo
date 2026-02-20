@@ -1,0 +1,23 @@
+[build]
+  command   = "npm run build"
+  publish   = "dist/angular_todo/browser"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler          = "esbuild"
+  external_node_modules = ["bcryptjs"]
+
+# Rewrite /api/* → Netlify Function
+# status=200 (rewrite, not redirect) preserves the original path in event.path
+# so Express routes /api/auth/login, /api/todos etc. match without changes
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/api"
+  status = 200
+  force  = true
+
+# SPA fallback: every non-file request serves index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
